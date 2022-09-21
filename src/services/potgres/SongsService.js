@@ -35,7 +35,35 @@ class SongsService {
     return result.rows[0].id;
   }
 
-  async getSongs() {
+  async getSongs(title, performer) {
+    if (title && performer) {
+      let query = {
+        text: `SELECT id,title,performer FROM songs WHERE title ILIKE $1 AND performer ILIKE $2`,
+        values: [title,performer],
+      };
+
+      const result = await this._pool.query(query);
+      return result.rows;
+    }
+
+    if (performer) {
+      let query = {
+        text: `SELECT id,title,performer FROM songs WHERE performer ILIKE $1`,
+        values: [performer],
+      };
+
+      const result = await this._pool.query(query);
+      return result.rows;
+    }
+    if (title) {
+      let query = {
+        text: `SELECT id,title,performer FROM songs WHERE performer ILIKE $1`,
+        values: [title],
+      };
+
+      const result = await this._pool.query(query);
+      return result.rows;
+    }
     const result = await this._pool.query(
       "SELECT id,title,performer FROM songs "
     );
@@ -55,7 +83,7 @@ class SongsService {
 
   async putSongById(id, { title, year, genre, performer, duration, albumId }) {
     const updatedAt = new Date().toISOString();
-    
+
     const query = {
       text: "UPDATE songs SET title = $1, year = $2, genre = $3, performer= $4, duration = $5, album_id = $6,  updated_at = $7 WHERE id = $8 RETURNING id",
       values: [title, year, genre, performer, duration, albumId, updatedAt, id],
