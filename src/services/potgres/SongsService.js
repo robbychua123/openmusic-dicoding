@@ -38,8 +38,8 @@ class SongsService {
   async getSongs(title, performer) {
     if (title && performer) {
       let query = {
-        text: `SELECT id,title,performer FROM songs WHERE title ILIKE $1 AND performer ILIKE $2`,
-        values: [title,performer],
+        text: "SELECT id,title,performer FROM songs WHERE title ILIKE '%'||$1||'%' AND performer ILIKE '%'||$2||'%'",
+        values: [title, performer],
       };
 
       const result = await this._pool.query(query);
@@ -48,16 +48,17 @@ class SongsService {
 
     if (performer) {
       let query = {
-        text: `SELECT id,title,performer FROM songs WHERE performer ILIKE $1`,
+        text: `SELECT id,title,performer FROM songs WHERE performer ILIKE '%'||$1||'%'`,
         values: [performer],
       };
 
       const result = await this._pool.query(query);
+
       return result.rows;
     }
     if (title) {
       let query = {
-        text: `SELECT id,title,performer FROM songs WHERE performer ILIKE $1`,
+        text: "SELECT id,title,performer FROM songs WHERE title ILIKE '%'||$1||'%'",
         values: [title],
       };
 
